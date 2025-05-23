@@ -30,7 +30,6 @@ $pshellArray = @()
 foreach ($runspace in $runspaceArray){
     $psh = [System.Management.Automation.PowerShell]::create()
     $psh.Runspace = $runspace
-    #$psh.Runspace.Connect()
     $pshellArray += $psh
 
 }
@@ -39,7 +38,7 @@ write-host "Powershell Objects Created"
 write-host "Enumerating Runspaces in each Powershell instance"
 $pshostRunspaces = [System.Collections.ArrayList]@()
 foreach($psh in $pshellArray){
-    $psh.AddScript({$pid})
+    $psh.AddScript({Get-Runspace})
     $results = [PSCustomObject]@{
         psh = $psh;
         async = $psh.BeginInvoke();
