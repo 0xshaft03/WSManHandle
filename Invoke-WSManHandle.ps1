@@ -1,3 +1,26 @@
+function Invoke-WSManHandle {
+    [CmdletBinding()]
+    param()
+    BEGIN{}
+    PROCESS{
+        while ($true) {
+            $input = Read-Host "WSManHandle> "  # Custom prompt
+            if ($input.Equals("exit") -or $input.Equals("q")) { break }  # Exit condition
+            if ($input.Equals("")){
+
+            }
+            try {
+                Invoke-Expression $input  # Execute input
+            } catch {
+                Write-Host "Error: $_"
+            }
+        }
+    }
+    END{}
+
+}
+
+
 $PSHosts = Get-PSHostProcessInfo
 
 [System.Management.Automation.Runspaces.NamedPipeConnectionInfo[]]$namedPipeConnectionInfoArray = @()
@@ -16,11 +39,10 @@ write-host "NamedPipeConnectionInfo Objects Created"
 #$namedPipeConnectionInfoArray
 
 write-host "Creating Runspaces"
-$runspaceArray = @()
+[System.Management.Automation.Runspaces.Runspace[]]$runspaceArray = @()
 foreach($namedPipeConnectionInfo in $namedPipeConnectionInfoArray){
     $runspace = [System.Management.Automation.Runspaces.RunspaceFactory]::CreateRunspace($namedPipeConnectionInfo)
     $runspace.Open()
-    
     $runspaceArray += $runspace
 }
 write-host "Runspaces Created"
@@ -35,10 +57,11 @@ foreach ($runspace in $runspaceArray){
 }
 write-host "Powershell Objects Created"
 
-write-host "Enumerating Runspaces in each Powershell instance"
+Write-Host "Now run whatever you want!"
+#write-host "Enumerating Runspaces in each Powershell instance"
 $pshostRunspaces = [System.Collections.ArrayList]@()
 foreach($psh in $pshellArray){
-    $psh.AddScript({Get-Runspace})
+    $psh.AddScript({$pid})
     $results = [PSCustomObject]@{
         psh = $psh;
         async = $psh.BeginInvoke();
